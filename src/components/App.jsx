@@ -1,59 +1,25 @@
-import { Routes, Route} from "react-router-dom";
-import { useState, useEffect } from "react";
-import { HeaderStyled, Link, NavStyled } from "./headerStyled";
-import GlobalStyle from './globalStyled'
-import axios from "axios";
-import { lazy,Suspense} from "react";
+import { lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { SharedLayout } from './SharedLayout/SharedLayout';
 
-const Home = lazy(() => import("../pages/home/Home"));
-const Movies = lazy(() => import("../pages/movies/Movies"));
-const Cast = lazy(() => import("./cast/cast"));
-const Reviews = lazy(() => import("./reviews/reviews"))
-const MovieDetails = lazy(() => import("../pages/movieDetails/MovieDetails"))
-const NotFound = lazy(() => import("../pages/notFound/notFound"))
+const Home = lazy(() => import('../pages/Home/Home'));
+const Movies = lazy(() => import('../pages/Movie/Movies'));
+const MovieDetails = lazy(() => import('../pages/MovieDetails/MovieDetails'));
+const Cast = lazy(() => import('./Cast/Cast'));
+const Reviews = lazy(() => import('./Reviews/Reviews'));
 
 export const App = () => {
-
-const KEY = `faab19b092cac6c59a97dec233a38f4d`;
-const BASEURL = `https://api.themoviedb.org/3/trending/movie/day?`;
-
-const [data, setData] = useState([])
-
-async function fetchMovieRating() {
-  try {
-    const response = await axios.get(`${BASEURL}api_key=${KEY}`)
-    setData(response.data.results)
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-useEffect(() => {
-  fetchMovieRating();
-
-}, [])
-
-
   return (
-    <div>
-      <GlobalStyle />
-      <HeaderStyled>
-        <NavStyled>
-          <Link to="/" end>Home</Link>
-          <Link to="/movies">Movies</Link>
-        </NavStyled>
-      </HeaderStyled>
-          <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        <Route path="/" element={<Home data={data} />} />
-          <Route path="/movies" element={<Movies />} />
-          <Route path="*" element={<NotFound />} /> 
-        <Route path="/movies/:movieId" element={<MovieDetails />}>
-          <Route path="/movies/:movieId/cast" element={<Cast />} />
-          <Route path="/movies/:movieId/reviews" element={<Reviews />} />
-          </ Route>
-        </Routes>
-        </Suspense>
-       </div>
+    <Routes>
+      <Route path="/" element={<SharedLayout />}>
+        <Route index element={<Home />} />
+        <Route path="movies" element={<Movies />} />
+        <Route path="movies/:movieId" element={<MovieDetails />}>
+          <Route path="cast" element={<Cast />} />
+          <Route path="reviews" element={<Reviews />} />
+        </Route>
+        <Route path="*" element={<Home />} />
+      </Route>
+    </Routes>
   );
 };
